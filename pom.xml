@@ -7,6 +7,12 @@
     <groupId>Homework-3</groupId>
     <artifactId>Remote-File-System</artifactId>
     <version>1.0-SNAPSHOT</version>
-
-
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbyclient</artifactId>
+            <version>10.13.1.1</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
 </project>

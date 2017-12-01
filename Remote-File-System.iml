@@ -11,5 +11,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.derby:derbyclient:10.13.1.1" level="project" />
   </component>
 </module>
