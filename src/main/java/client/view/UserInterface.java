@@ -21,129 +21,94 @@ public class UserInterface {
 
     void run () {
         while (true){
-            Scanner scanner = new Scanner(System.in);
-            String userInput = scanner.nextLine();
+            try {
+                Scanner scanner = new Scanner(System.in);
+                String userInput = scanner.nextLine();
 
-            switch (userInput){
-                case "create":
-                    create();
-                    break;
+                switch (userInput) {
+                    case "create":
+                        create();
+                        break;
 
-                case "delete":
-                    delete();
-                    break;
+                    case "delete":
+                        delete();
+                        break;
 
-                case "login":
-                    login();
-                    break;
+                    case "login":
+                        login();
+                        break;
 
-                case "logout":
-                    logout();
-                    break;
+                    case "logout":
+                        logout();
+                        break;
 
-                case "list":
-                    list();
-                    break;
+                    case "list":
+                        list();
+                        break;
 
-                case "upload":
-                    upload();
-                    break;
+                    case "upload":
+                        upload();
+                        break;
 
-                case "download":
-                    download();
-                    break;
+                    case "download":
+                        download();
+                        break;
 
-                default:
-                    System.out.println("Not a command");
+                    default:
+                        System.out.println("Not a command");
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    private void create() {
+    private void create() throws RemoteException {
+        String userName = outputInput("Enter your new username");
+        String password = outputInput("Enter your new password");
+        server.createAccount(userName, password);
+    }
+
+    private void delete() throws RemoteException {
+        server.deleteAccount();
+        System.out.println("Deleted your account");
+    }
+
+    private void login() throws RemoteException {
+        String userName = outputInput("Enter your username");
+        String password = outputInput("Enter your password");
+        server.login(remoteClient, userName, password);
+    }
+
+    private void logout() throws RemoteException {
+        server.logout();
+        System.out.println("Logged out your account");
+    }
+
+    private void list() throws RemoteException {
+        List<String> fileList = server.listFiles();
+        System.out.println("Here's your files: ");
+
+        for (String s: fileList) {
+            System.out.println(s);
+        }
+    }
+
+    private void upload() throws RemoteException {
+        server.uploadToDB();
+    }
+
+    private void download() throws RemoteException {
+        String file = outputInput("Enter your username");
+        server.downloadFromDB(file);
+    }
+
+    private String outputInput (String msg) {
         Scanner sc = new Scanner(System.in);
-        String userName;
-        String password;
-        System.out.println("Enter you username:");
-        userName = sc.nextLine();
-        System.out.println("Enter your password:");
-        password = sc.nextLine();
-        try {
-            server.createAccount(userName, password);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-        return;
-    }
-
-    private void delete() {
-        try {
-            server.deleteAccount();
-            System.out.println("Deleted your account");
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-        return;
-    }
-
-    private void login() {
-        Scanner sc = new Scanner(System.in);
-        String userName;
-        String password;
-        System.out.println("Enter you username:");
-        userName = sc.nextLine();
-        System.out.println("Enter your password:");
-        password = sc.nextLine();
-        try {
-            server.login(remoteClient, userName, password);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-        return;
-    }
-
-    private void logout() {
-        try {
-            server.logout();
-            System.out.println("Logged out your account");
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-        return;
-    }
-
-    private void list() {
-        try {
-            List<String> fileList = server.listFiles();
-            System.out.println("Here's your files: ");
-            for (String s: fileList) {
-                System.out.println(s);
-            }
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-        return;
-    }
-
-    private void upload() {
-        try {
-            server.uploadToDB();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-        return;
-    }
-
-    private void download() {
-        Scanner sc = new Scanner(System.in);
-        String file;
-        System.out.println("Enter the file you want to download:");
-        file = sc.nextLine();
-        try {
-            server.downloadFromDB(file);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-        return;
+        String input;
+        System.out.println(msg);
+        input = sc.nextLine();
+        return input;
     }
 
     private class ServerOutput extends UnicastRemoteObject implements CatalogueClient {
@@ -156,5 +121,4 @@ public class UserInterface {
             System.out.println(message);
         }
     }
-
 }

@@ -6,7 +6,7 @@ import common.CatalogueServer;
 import java.net.MalformedURLException;
 import java.rmi.*;
 
-public class Main {
+public class Client {
     public static void main(String[] args) {
         try {
             CatalogueServer server = (CatalogueServer) Naming.lookup("FILE_SERVER");
