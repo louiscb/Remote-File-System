@@ -12,7 +12,8 @@ public class Client {
             CatalogueServer server = (CatalogueServer) Naming.lookup("FILE_SERVER");
             UserInterface ui = new UserInterface(server);
         } catch (RemoteException | NotBoundException | MalformedURLException e) {
-            e.printStackTrace();
+            System.out.println("Couldn't find server");
+            //e.printStackTrace();
         }
     }
 }

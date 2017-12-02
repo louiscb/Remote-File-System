@@ -10,7 +10,7 @@ import java.util.List;
 public class Controller extends UnicastRemoteObject implements CatalogueServer {
 
     public Controller() throws RemoteException {
-        System.out.println("Server Connected");
+        System.out.println("Server Running...");
     }
 
     @Override

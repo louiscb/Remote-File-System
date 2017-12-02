@@ -15,7 +15,7 @@ public class UserInterface {
     public UserInterface (CatalogueServer server) throws RemoteException {
         this.server = server;
         this.remoteClient = new ServerOutput();
-        System.out.println("Connected to server");
+        System.out.println("Connected to server...");
         run();
     }
 
