@@ -13,7 +13,7 @@ public class Client {
             UserInterface ui = new UserInterface(server);
         } catch (RemoteException | NotBoundException | MalformedURLException e) {
             System.out.println("Couldn't find server");
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
 }

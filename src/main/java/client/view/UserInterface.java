@@ -71,7 +71,6 @@ public class UserInterface {
 
     private void delete() throws RemoteException {
         server.deleteAccount();
-        System.out.println("Deleted your account");
     }
 
     private void login() throws RemoteException {
@@ -86,12 +85,12 @@ public class UserInterface {
     }
 
     private void list() throws RemoteException {
-        List<String> fileList = server.listFiles();
+        List<String> fileList = server.listFiles(remoteClient);
         System.out.println("Here's your files: ");
 
-        for (String s: fileList) {
-            System.out.println(s);
-        }
+//        for (String s: fileList) {
+//            System.out.println(s);
+//        }
     }
 
     private void upload() throws RemoteException {
@@ -112,12 +111,21 @@ public class UserInterface {
     }
 
     private class ServerOutput extends UnicastRemoteObject implements CatalogueClient {
+        public int clientId =-1;
 
         protected ServerOutput() throws RemoteException { }
 
         @Override
         public void receiveMessage(String message) throws RemoteException {
             System.out.println(message);
+        }
+
+        public void setId (int id) throws RemoteException {
+            clientId = id;
+        }
+
+        public int getId () throws RemoteException {
+            return clientId;
         }
     }
 }
