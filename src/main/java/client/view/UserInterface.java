@@ -86,16 +86,20 @@ public class UserInterface {
 
     private void list() throws RemoteException {
         List<String> fileList = server.listFiles(remoteClient);
-        System.out.println("Here's your files: ");
 
-//        for (String s: fileList) {
-//            System.out.println(s);
-//        }
+        if(fileList != null) {
+            System.out.println("Here's your files: ");
+
+            for (String s : fileList) {
+                System.out.println(s);
+            }
+        }
     }
 
     private void upload() throws RemoteException {
         String file = outputInput("Enter the name of the file you want to upload: ");
-        server.uploadToDB(remoteClient, file);
+        String isPrivate = outputInput("Do you want the file to be private? (Enter yes or no): ");
+        server.uploadToDB(remoteClient, file, isPrivate);
     }
 
     private void download() throws RemoteException {

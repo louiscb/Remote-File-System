@@ -84,20 +84,30 @@ public class Controller extends UnicastRemoteObject implements CatalogueServer {
         if (!isLoggedIn(remoteClient))
             return null;
 
-        List<String> files = db.getFiles(remoteClient.getId());
-        remoteClient.receiveMessage("Here are your files: ");
+        List<String> files = null;
+        try {
+            files = db.getFiles(remoteClient.getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return files;
     }
 
     @Override
-    public void uploadToDB(CatalogueClient remoteClient, String fileName) throws RemoteException {
-        if(!isLoggedIn(remoteClient))
+    public void uploadToDB(CatalogueClient remoteClient, String fileName, String isPrivate) throws RemoteException {
+        if (!isLoggedIn(remoteClient))
             return;
 
+        //default is privacy is yes
+        int isPrivateDB = 1;
+
+        if (isPrivate.equalsIgnoreCase("no"))
+            isPrivateDB = 0;
+
         try {
-            db.upload(remoteClient.getId(), fileName);
+            db.upload(remoteClient.getId(), fileName, isPrivateDB);
             remoteClient.receiveMessage("Upload successful");
-        } catch (FileUploadError e) {
+        } catch (FileUploadError | SQLException e) {
             remoteClient.receiveMessage("File " + fileName + " didn't upload");
         }
     }
@@ -108,8 +118,20 @@ public class Controller extends UnicastRemoteObject implements CatalogueServer {
             return;
 
         try {
-            String fileMetaData = db.download(remoteClient.getId(), fileName);
-            remoteClient.receiveMessage("Here's your file: " + fileMetaData);
+            String fileMetaData = null;
+            try {
+                fileMetaData = db.download(remoteClient.getId(), fileName);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            if(fileMetaData.trim().length() > 0){
+                remoteClient.receiveMessage("Here's your file: " + "\n" + fileMetaData);
+            }
+            else{
+                remoteClient.receiveMessage("File is not found");
+            }
+
         } catch (FileDownloadError e) {
             remoteClient.receiveMessage("File didn't download");
         }
