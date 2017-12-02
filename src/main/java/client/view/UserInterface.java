@@ -66,11 +66,11 @@ public class UserInterface {
     private void create() throws RemoteException {
         String userName = outputInput("Enter your new username: ");
         String password = outputInput("Enter your new password: ");
-        server.createAccount(userName, password);
+        server.createAccount(remoteClient, userName, password);
     }
 
     private void delete() throws RemoteException {
-        server.deleteAccount();
+        server.deleteAccount(remoteClient);
     }
 
     private void login() throws RemoteException {
@@ -80,7 +80,7 @@ public class UserInterface {
     }
 
     private void logout() throws RemoteException {
-        server.logout();
+        server.logout(remoteClient);
         System.out.println("Logged out your account");
     }
 
@@ -94,12 +94,13 @@ public class UserInterface {
     }
 
     private void upload() throws RemoteException {
-        server.uploadToDB();
+        String file = outputInput("Enter the name of the file you want to upload: ");
+        server.uploadToDB(remoteClient, file);
     }
 
     private void download() throws RemoteException {
-        String file = outputInput("Enter your username: ");
-        server.downloadFromDB(file);
+        String file = outputInput("Enter the name of the file you want to download: ");
+        server.downloadFromDB(remoteClient, file);
     }
 
     private String outputInput (String msg) {

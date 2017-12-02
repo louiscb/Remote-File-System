@@ -3,6 +3,8 @@ package server.controller;
 import common.CatalogueClient;
 import common.CatalogueServer;
 import server.integration.DBConnector;
+import server.integration.FileDownloadError;
+import server.integration.FileUploadError;
 
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
@@ -19,13 +21,37 @@ public class Controller extends UnicastRemoteObject implements CatalogueServer {
     }
 
     @Override
-    public void createAccount(String name, String password) throws RemoteException {
-        System.out.println(name + " , " + password);
+    public void createAccount(CatalogueClient remoteClient, String name, String password) throws RemoteException {
+        try {
+            if(db.isUserNameTaken(name)) {
+                remoteClient.receiveMessage("Username taken, try another name");
+                return;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            db.createAccount(name, password);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        remoteClient.receiveMessage("You've created your account, please log in");
     }
 
     @Override
-    public void deleteAccount() throws RemoteException {
+    public void deleteAccount(CatalogueClient remoteClient) throws RemoteException {
+        if(!isLoggedIn(remoteClient))
+            return;
 
+        try {
+            db.deleteAccount(remoteClient.getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        logout(remoteClient);
+        remoteClient.receiveMessage("Your account has been deleted");
     }
 
     @Override
@@ -39,16 +65,18 @@ public class Controller extends UnicastRemoteObject implements CatalogueServer {
         }
 
         if (id > 0) {
-            remoteClient.receiveMessage("You are logged in");
+            remoteClient.receiveMessage("Hello " + name + "! You are now logged in");
             remoteClient.setId(id);
         } else {
             remoteClient.receiveMessage("Invalid username or password");
         }
+        db.testPrint();
     }
 
     @Override
-    public void logout() throws RemoteException {
-
+    public void logout(CatalogueClient remoteClient) throws RemoteException {
+        remoteClient.setId(-1);
+        remoteClient.receiveMessage("You are now logged out");
     }
 
     @Override
@@ -56,22 +84,35 @@ public class Controller extends UnicastRemoteObject implements CatalogueServer {
         if (!isLoggedIn(remoteClient))
             return null;
 
-        //code
-
-        return null;
+        List<String> files = db.getFiles(remoteClient.getId());
+        remoteClient.receiveMessage("Here are your files: ");
+        return files;
     }
 
     @Override
-    public boolean status() throws RemoteException {
-        return false;
+    public void uploadToDB(CatalogueClient remoteClient, String fileName) throws RemoteException {
+        if(!isLoggedIn(remoteClient))
+            return;
+
+        try {
+            db.upload(remoteClient.getId(), fileName);
+            remoteClient.receiveMessage("Upload successful");
+        } catch (FileUploadError e) {
+            remoteClient.receiveMessage("File " + fileName + " didn't upload");
+        }
     }
 
     @Override
-    public void uploadToDB() throws RemoteException {
-    }
+    public void downloadFromDB(CatalogueClient remoteClient, String fileName) throws RemoteException {
+        if(!isLoggedIn(remoteClient))
+            return;
 
-    @Override
-    public void downloadFromDB( String fileName) throws RemoteException {
+        try {
+            String fileMetaData = db.download(remoteClient.getId(), fileName);
+            remoteClient.receiveMessage("Here's your file: " + fileMetaData);
+        } catch (FileDownloadError e) {
+            remoteClient.receiveMessage("File didn't download");
+        }
     }
 
     private boolean isLoggedIn(CatalogueClient remoteClient) throws RemoteException {
@@ -82,5 +123,4 @@ public class Controller extends UnicastRemoteObject implements CatalogueServer {
             return true;
         }
     }
-
 }

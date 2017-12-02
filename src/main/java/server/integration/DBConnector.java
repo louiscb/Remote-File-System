@@ -1,6 +1,7 @@
 package server.integration;
 
 import java.sql.*;
+import java.util.List;
 
 public class DBConnector {
     private static String dburl = "jdbc:derby://localhost:1620/fileSystemDB;user=admin;password=admin";
@@ -59,5 +60,52 @@ public class DBConnector {
         results.close();
         statement.close();
         return id;
+    }
+
+    public boolean isUserNameTaken(String name) throws SQLException {
+        String str = null;
+        statement = connection.createStatement();
+        ResultSet results = statement.executeQuery("select username from accounts where username  = '" + name + "' ");
+        if(results.next())
+            str = results.getString(1);
+        results.close();
+        statement.close();
+
+        if(str!=null)
+            return true;
+
+        else
+            return false;
+
+    }
+
+    public void createAccount(String name, String password) throws SQLException {
+        statement = connection.createStatement();
+        statement.execute("insert into accounts (username, password) values ('" + name + "', '" + password +"')");
+        statement.close();
+        testPrint();
+    }
+
+    public void deleteAccount(int id) throws SQLException{
+        statement = connection.createStatement();
+        statement.execute("delete from accounts where id = " + id);
+        statement.close();
+        testPrint();
+
+    }
+
+    public List<String> getFiles(int id) throws SQLException{
+        statement= connection.createStatement();
+
+
+        statement.close();
+        return null;
+    }
+
+    public void upload(int id, String fileName) throws FileUploadError {
+    }
+
+    public String download(int id, String fileName) throws FileDownloadError {
+        return null;
     }
 }
