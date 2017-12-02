@@ -29,5 +29,4 @@ public class Server {
             LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
         }
     }
-
 }

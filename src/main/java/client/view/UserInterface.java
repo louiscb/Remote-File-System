@@ -64,8 +64,8 @@ public class UserInterface {
     }
 
     private void create() throws RemoteException {
-        String userName = outputInput("Enter your new username");
-        String password = outputInput("Enter your new password");
+        String userName = outputInput("Enter your new username: ");
+        String password = outputInput("Enter your new password: ");
         server.createAccount(userName, password);
     }
 
@@ -75,8 +75,8 @@ public class UserInterface {
     }
 
     private void login() throws RemoteException {
-        String userName = outputInput("Enter your username");
-        String password = outputInput("Enter your password");
+        String userName = outputInput("Enter your username: ");
+        String password = outputInput("Enter your password: ");
         server.login(remoteClient, userName, password);
     }
 
@@ -99,22 +99,21 @@ public class UserInterface {
     }
 
     private void download() throws RemoteException {
-        String file = outputInput("Enter your username");
+        String file = outputInput("Enter your username: ");
         server.downloadFromDB(file);
     }
 
     private String outputInput (String msg) {
         Scanner sc = new Scanner(System.in);
         String input;
-        System.out.println(msg);
+        System.out.print(msg);
         input = sc.nextLine();
         return input;
     }
 
     private class ServerOutput extends UnicastRemoteObject implements CatalogueClient {
 
-        protected ServerOutput() throws RemoteException {
-        }
+        protected ServerOutput() throws RemoteException { }
 
         @Override
         public void receiveMessage(String message) throws RemoteException {
