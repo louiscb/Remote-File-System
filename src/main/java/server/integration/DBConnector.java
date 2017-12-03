@@ -143,11 +143,13 @@ public class DBConnector {
         statement = connection.createStatement();
         StringBuilder stringBuilder = new StringBuilder();
         ResultSet results = statement.executeQuery("select * from files where (name = '" + fileName + "' AND owner_id = " + id + ") OR (name = '" + fileName + "' AND is_private = " + 0 + ")");
-        if(results.next()){
+
+        if(results.next()) {
             stringBuilder.append("Owner: ").append(results.getString(2)).append("\n");
             stringBuilder.append("File name: ").append(results.getString(3)).append("\n");
             stringBuilder.append("Permissions: ").append(results.getString(4)).append("\n");
         }
+
         statement.close();
         System.out.println(String.valueOf(stringBuilder));
         return String.valueOf(stringBuilder);
