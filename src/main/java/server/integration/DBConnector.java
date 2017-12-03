@@ -67,7 +67,9 @@ public class DBConnector {
                 String restName = results.getString(2);
                 String cityName = results.getString(3);
                 String cityName1 = results.getString(4);
-                System.out.println(id + "\t\t" + restName + "\t\t" + cityName + "\t\t" + cityName1);
+                String priv = results.getString(5);
+                String size = results.getString(6);
+                System.out.println(id + "\t\t" + restName + "\t\t" + cityName + "\t\t" + cityName1 + "\t\t" + priv + "\t\t" + size);
             }
 
             results.close();
@@ -133,10 +135,14 @@ public class DBConnector {
         return list;
     }
 
-    public void upload(int id, String fileName, int isPrivate) throws FileUploadError, SQLException {
+    public void upload(int id, String fileName, int isPrivate, String privilege) throws FileUploadError, SQLException {
         statement = connection.createStatement();
-        statement.execute("insert into files (owner_id, name, is_private) values ("+ id +", '"+ fileName +"',"+ isPrivate +" ) ");
+
+        //Creating random file size as files don't really exist
+        int size = (int) (Math.random() * 500);
+        statement.execute("insert into files (owner_id, name, is_private, privilege, size) values ("+ id +", '"+ fileName +"', "+ isPrivate +", '" + privilege + "', " + size + ")");
         statement.close();
+        testPrintTable();
     }
 
     public String download(int id, String fileName) throws FileDownloadError, SQLException {
@@ -145,13 +151,42 @@ public class DBConnector {
         ResultSet results = statement.executeQuery("select * from files where (name = '" + fileName + "' AND owner_id = " + id + ") OR (name = '" + fileName + "' AND is_private = " + 0 + ")");
 
         if(results.next()) {
-            stringBuilder.append("Owner: ").append(results.getString(2)).append("\n");
+            stringBuilder.append("Owner: ").append(getOwnerName(results.getString(2))).append("\n");
             stringBuilder.append("File name: ").append(results.getString(3)).append("\n");
-            stringBuilder.append("Permissions: ").append(results.getString(4)).append("\n");
+            stringBuilder.append("Permissions: ").append(getPermission(results.getString(4))).append("\n");
+            stringBuilder.append("Privilege: ").append(results.getString(5)).append("\n");
+            stringBuilder.append("Size: ").append(results.getString(6)).append("MB").append("\n");
+
         }
 
         statement.close();
         System.out.println(String.valueOf(stringBuilder));
         return String.valueOf(stringBuilder);
+    }
+
+    private String getPermission(String permission) {
+        if(permission.equals(0)){
+            return "Public";
+        }
+        return "Private";
+    }
+
+    private String getOwnerName (String ownerId ) throws SQLException{
+        Statement st = connection.createStatement();
+        ResultSet results = st.executeQuery( "select username from accounts where id = " + ownerId);
+        String ownerName = null;
+        if(results.next()){
+            ownerName = results.getString(1);
+        }
+        st.close();
+        return ownerName;
+    }
+
+
+    public void deleteFile(String fileName) throws SQLException{
+        Statement st = connection.createStatement();
+        st.execute("delete from files where name = '" + fileName + "'");
+        st.close();
+        testPrint();
     }
 }

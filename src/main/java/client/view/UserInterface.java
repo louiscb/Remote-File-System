@@ -30,8 +30,8 @@ public class UserInterface {
                         create();
                         break;
 
-                    case "delete":
-                        delete();
+                    case "delete account":
+                        deleteAccount();
                         break;
 
                     case "login":
@@ -54,6 +54,10 @@ public class UserInterface {
                         download();
                         break;
 
+                    case "delete file":
+                        deleteFile();
+                        break;
+
                     default:
                         System.out.println("Not a command");
                 }
@@ -63,13 +67,14 @@ public class UserInterface {
         }
     }
 
+
     private void create() throws RemoteException {
         String userName = outputInput("Enter your new username: ");
         String password = outputInput("Enter your new password: ");
         server.createAccount(remoteClient, userName, password);
     }
 
-    private void delete() throws RemoteException {
+    private void deleteAccount() throws RemoteException {
         server.deleteAccount(remoteClient);
     }
 
@@ -98,13 +103,36 @@ public class UserInterface {
 
     private void upload() throws RemoteException {
         String file = outputInput("Enter the name of the file you want to upload: ");
-        String isPrivate = outputInput("Do you want the file to be private? (Enter yes or no): ");
-        server.uploadToDB(remoteClient, file, isPrivate);
+        String isPublic = outputInput("Do you want the file to be public? (Enter yes or no): ");
+
+        String privilege = "Read & Write";
+
+        if (isPublic.contains("yes")) {
+            while (true) {
+                privilege = outputInput("Enter a number for the privileges you want other people to have: 1) Read Only 2) Read & Write");
+                if (privilege.equals("1")) {
+                    privilege = "Read Only";
+                    break;
+                } else if (privilege.equals("2")) {
+                    privilege = "Read & Write";
+                    break;
+                } else {
+                    System.out.println("Wrong input");
+                }
+            }
+        }
+
+        server.uploadToDB(remoteClient, file, isPublic, privilege);
     }
 
     private void download() throws RemoteException {
         String file = outputInput("Enter the name of the file you want to download: ");
         server.downloadFromDB(remoteClient, file);
+    }
+
+    private void deleteFile() throws RemoteException {
+        String fileName = outputInput("Enter the name of the file to be delete");
+        server.deleteFile(remoteClient, fileName);
     }
 
     private String outputInput (String msg) {

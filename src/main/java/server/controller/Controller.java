@@ -94,18 +94,18 @@ public class Controller extends UnicastRemoteObject implements CatalogueServer {
     }
 
     @Override
-    public void uploadToDB(CatalogueClient remoteClient, String fileName, String isPrivate) throws RemoteException {
+    public void uploadToDB(CatalogueClient remoteClient, String fileName, String isPublic, String privilege) throws RemoteException {
         if (!isLoggedIn(remoteClient))
             return;
 
         //default is privacy is yes
         int isPrivateDB = 1;
 
-        if (isPrivate.equalsIgnoreCase("no"))
+        if (isPublic.equalsIgnoreCase("yes"))
             isPrivateDB = 0;
 
         try {
-            db.upload(remoteClient.getId(), fileName, isPrivateDB);
+            db.upload(remoteClient.getId(), fileName, isPrivateDB, privilege);
             remoteClient.receiveMessage("Upload successful");
         } catch (FileUploadError | SQLException e) {
             remoteClient.receiveMessage("File " + fileName + " didn't upload");
@@ -135,6 +135,19 @@ public class Controller extends UnicastRemoteObject implements CatalogueServer {
         } catch (FileDownloadError e) {
             remoteClient.receiveMessage("File didn't download");
         }
+    }
+
+    @Override
+    public void deleteFile(CatalogueClient remoteClient, String fileName) throws RemoteException {
+        if(!isLoggedIn(remoteClient))
+            return;
+
+        try {
+            db.deleteFile(fileName);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        remoteClient.receiveMessage("file " + fileName + " has been deleted");
     }
 
     private boolean isLoggedIn(CatalogueClient remoteClient) throws RemoteException {

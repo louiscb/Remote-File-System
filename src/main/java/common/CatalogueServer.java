@@ -18,8 +18,9 @@ public interface CatalogueServer extends Remote {
 
     public List<String> listFiles (CatalogueClient remoteClient) throws RemoteException;
 
-    public void uploadToDB(CatalogueClient remoteClient, String fileName, String isPrivate) throws RemoteException;
+    public void uploadToDB(CatalogueClient remoteClient, String fileName, String isPrivate, String privilege) throws RemoteException;
 
     public void downloadFromDB (CatalogueClient remoteClient, String fileName) throws RemoteException;
 
+    void deleteFile(CatalogueClient remoteClient, String fileName) throws RemoteException;
 }
