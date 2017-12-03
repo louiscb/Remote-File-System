@@ -22,63 +22,6 @@ public class DBConnector {
         }
     }
 
-    public void testPrint (){
-        try {
-            statement = connection.createStatement();
-            ResultSet results = statement.executeQuery("select * from accounts");
-            ResultSetMetaData rsmd = results.getMetaData();
-            int numberCols = rsmd.getColumnCount();
-            for (int i=1; i<=numberCols; i++) {
-                //print Column Names
-                System.out.print(rsmd.getColumnLabel(i)+"\t\t");
-            }
-
-            System.out.println("\n-------------------------------------------------");
-
-            while(results.next()) {
-                int id = results.getInt(1);
-                String restName = results.getString(2);
-                String cityName = results.getString(3);
-                System.out.println(id + "\t\t" + restName + "\t\t" + cityName);
-            }
-
-            results.close();
-            statement.close();
-        } catch (SQLException sqlExcept) {
-            sqlExcept.printStackTrace();
-        }
-    }
-
-    public void testPrintTable (){
-        try {
-            statement = connection.createStatement();
-            ResultSet results = statement.executeQuery("select * from files");
-            ResultSetMetaData rsmd = results.getMetaData();
-            int numberCols = rsmd.getColumnCount();
-            for (int i=1; i<=numberCols; i++) {
-                //print Column Names
-                System.out.print(rsmd.getColumnLabel(i)+"\t\t");
-            }
-
-            System.out.println("\n-------------------------------------------------");
-
-            while(results.next()) {
-                int id = results.getInt(1);
-                String restName = results.getString(2);
-                String cityName = results.getString(3);
-                String cityName1 = results.getString(4);
-                String priv = results.getString(5);
-                String size = results.getString(6);
-                System.out.println(id + "\t\t" + restName + "\t\t" + cityName + "\t\t" + cityName1 + "\t\t" + priv + "\t\t" + size);
-            }
-
-            results.close();
-            statement.close();
-        } catch (SQLException sqlExcept) {
-            sqlExcept.printStackTrace();
-        }
-    }
-
     public int getUserID(String name, String password) throws SQLException {
         statement = connection.createStatement();
         ResultSet results = statement.executeQuery("select id from accounts where username = '" + name + "' AND password = '" + password + "'");
@@ -114,14 +57,12 @@ public class DBConnector {
         statement = connection.createStatement();
         statement.execute("insert into accounts (username, password) values ('" + name + "', '" + password +"')");
         statement.close();
-        testPrint();
     }
 
     public void deleteAccount(int id) throws SQLException{
         statement = connection.createStatement();
         statement.execute("delete from accounts where id = " + id);
         statement.close();
-        testPrint();
     }
 
     public List<String> getFiles(int id) throws SQLException{
@@ -142,7 +83,6 @@ public class DBConnector {
         int size = (int) (Math.random() * 500);
         statement.execute("insert into files (owner_id, name, is_private, privilege, size) values ("+ id +", '"+ fileName +"', "+ isPrivate +", '" + privilege + "', " + size + ")");
         statement.close();
-        testPrintTable();
     }
 
     public String download(int id, String fileName) throws FileDownloadError, SQLException {
@@ -171,7 +111,7 @@ public class DBConnector {
         return "Private";
     }
 
-    private String getOwnerName (String ownerId ) throws SQLException{
+    private String getOwnerName (String ownerId) throws SQLException{
         Statement st = connection.createStatement();
         ResultSet results = st.executeQuery( "select username from accounts where id = " + ownerId);
         String ownerName = null;
@@ -182,11 +122,26 @@ public class DBConnector {
         return ownerName;
     }
 
-
     public void deleteFile(String fileName) throws SQLException{
         Statement st = connection.createStatement();
         st.execute("delete from files where name = '" + fileName + "'");
         st.close();
-        testPrint();
+    }
+
+    public boolean isFileNameTaken(String fileName) throws SQLException{
+        String str = null;
+        statement = connection.createStatement();
+        ResultSet results = statement.executeQuery("select name from files where name  = '" + fileName + "'");
+
+        if(results.next())
+            str = results.getString(1);
+
+        results.close();
+        statement.close();
+
+        if(str!=null)
+            return true;
+        else
+            return false;
     }
 }

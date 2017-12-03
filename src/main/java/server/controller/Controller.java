@@ -70,7 +70,6 @@ public class Controller extends UnicastRemoteObject implements CatalogueServer {
         } else {
             remoteClient.receiveMessage("Invalid username or password");
         }
-        db.testPrint();
     }
 
     @Override
@@ -97,6 +96,15 @@ public class Controller extends UnicastRemoteObject implements CatalogueServer {
     public void uploadToDB(CatalogueClient remoteClient, String fileName, String isPublic, String privilege) throws RemoteException {
         if (!isLoggedIn(remoteClient))
             return;
+
+        try {
+            if (db.isFileNameTaken(fileName)) {
+                remoteClient.receiveMessage("File name taken, try another file name");
+                return;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         //default is privacy is yes
         int isPrivateDB = 1;
