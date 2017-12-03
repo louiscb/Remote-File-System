@@ -86,7 +86,6 @@ public class UserInterface {
 
     private void logout() throws RemoteException {
         server.logout(remoteClient);
-        System.out.println("Logged out your account");
     }
 
     private void list() throws RemoteException {
@@ -109,7 +108,7 @@ public class UserInterface {
 
         if (isPublic.contains("yes")) {
             while (true) {
-                privilege = outputInput("Enter a number for the privileges you want other people to have: 1) Read Only 2) Read & Write");
+                privilege = outputInput("Enter a number for the privileges you want other people to have: 1) Read Only 2) Read & Write: ");
                 if (privilege.equals("1")) {
                     privilege = "Read Only";
                     break;
@@ -131,7 +130,7 @@ public class UserInterface {
     }
 
     private void deleteFile() throws RemoteException {
-        String fileName = outputInput("Enter the name of the file to be delete");
+        String fileName = outputInput("Enter the name of the file to be delete: ");
         server.deleteFile(remoteClient, fileName);
     }
 
